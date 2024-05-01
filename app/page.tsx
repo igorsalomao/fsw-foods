@@ -1,7 +1,7 @@
-import CategoryList from "./_components/CategoryList";
+import CategoryList from "./_components/category-list";
 import Header from "./_components/Header";
 import Search from "./_components/Search";
-import ProductList from "./_components/ProductList";
+import ProductList from "./_components/product-list";
 import { Button } from "./_components/ui/button";
 import { ChevronRightIcon } from "lucide-react";
 import { db } from "./_lib/prisma";

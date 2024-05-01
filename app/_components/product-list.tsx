@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import ProductItem from "./ProductItem";
+import ProductItem from "./product-item";
 
 interface ProductListProps {
   products: Prisma.ProductGetPayload<{
