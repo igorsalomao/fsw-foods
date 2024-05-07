@@ -1052,8 +1052,6 @@ const main = async () => {
   await createPizzas(desertsCategory.id, juicesCategory.id);
   await createJapanese(desertsCategory.id, juicesCategory.id);
   await createBrazilian(desertsCategory.id, juicesCategory.id);
-  await createJuices(desertsCategory.id, juicesCategory.id);
-  await createDeserts(desertsCategory.id, juicesCategory.id);
 };
 
 main()
