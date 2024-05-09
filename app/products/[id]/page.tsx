@@ -41,6 +41,7 @@ const ProductPage = async ({ params: { id } }: ProductPageProps) => {
     <div>
       {/* IMAGEM */}
       <ProductImage product={product} />
+
       {/* TITULO E PREÇO */}
       <ProductDetails product={product} complementaryProducts={juices} />
     </div>
