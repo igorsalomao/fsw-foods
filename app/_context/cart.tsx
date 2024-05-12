@@ -23,7 +23,11 @@ interface ICartContext {
   subtotalPrice: number;
   totalPrice: number;
   totalDiscounts: number;
-  addProductToCart: (
+  addProductToCart: ({
+    product,
+    quantity,
+    emptyCart,
+  }: {
     product: Prisma.ProductGetPayload<{
       include: {
         restaurant: {
@@ -32,9 +36,10 @@ interface ICartContext {
           };
         };
       };
-    }>,
-    quantity: number,
-  ) => void;
+    }>;
+    quantity: number;
+    emptyCart?: boolean;
+  }) => void;
   decreaseProductQuantity: (productId: string) => void;
   increaseProductQuantity: (productId: string) => void;
   removeProductFromCart: (productId: string) => void;
@@ -107,7 +112,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  const addProductToCart = (
+  const addProductToCart = ({
+    product,
+    quantity,
+    emptyCart,
+  }: {
     product: Prisma.ProductGetPayload<{
       include: {
         restaurant: {
@@ -116,9 +125,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           };
         };
       };
-    }>,
-    quantity: number,
-  ) => {
+    }>;
+    quantity: number;
+    emptyCart?: boolean;
+  }) => {
+    if (emptyCart) {
+      setProducts([]);
+    }
+
+    // VERIFICAR SE HÁ ALGUM PRODUTO DE OUTRRO RESTAURANTE NO CARRINHO
+    const hasDifferentRestaurantProduct = products.some(
+      (cartProduct) => cartProduct.restaurantId !== product.restaurantId,
+    );
+
     // VERIFICAR SE O PRODUTO JA ESTA NO CARRINHO E
     const isProductAlreadyOnCart = products.some(
       (cartProduct) => cartProduct.id === product.id,
