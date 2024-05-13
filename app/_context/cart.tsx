@@ -10,7 +10,9 @@ export interface CartProduct
     include: {
       restaurant: {
         select: {
+          id: true;
           deliveryFee: true;
+          deliveryTimeMinutes: true;
         };
       };
     };
@@ -33,7 +35,9 @@ interface ICartContext {
       include: {
         restaurant: {
           select: {
+            id: true;
             deliveryFee: true;
+            deliveryTimeMinutes: true;
           };
         };
       };
@@ -44,6 +48,7 @@ interface ICartContext {
   decreaseProductQuantity: (productId: string) => void;
   increaseProductQuantity: (productId: string) => void;
   removeProductFromCart: (productId: string) => void;
+  clearCart: () => void;
 }
 
 export const CartContext = createContext<ICartContext>({
@@ -56,6 +61,7 @@ export const CartContext = createContext<ICartContext>({
   decreaseProductQuantity: () => {},
   increaseProductQuantity: () => {},
   removeProductFromCart: () => {},
+  clearCart: () => {},
 });
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
@@ -68,9 +74,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [products]);
 
   const totalPrice = useMemo(() => {
-    return products.reduce((acc, product) => {
-      return acc + calculateProductTotalPrice(product) * product.quantity;
-    }, 0);
+    return (
+      products.reduce((acc, product) => {
+        return acc + calculateProductTotalPrice(product) * product.quantity;
+      }, 0) + Number(products?.[0]?.restaurant?.deliveryFee)
+    );
   }, [products]);
 
   const totalQuantity = useMemo(() => {
@@ -82,6 +90,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const totalDiscounts =
     subtotalPrice - totalPrice + Number(products?.[0]?.restaurant?.deliveryFee);
 
+  const clearCart = () => {
+    return setProducts([]);
+  };
+
   const decreaseProductQuantity = (productId: string) => {
     return setProducts((prev) =>
       prev.map((cartProduct) => {
@@ -89,6 +101,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           if (cartProduct.quantity === 1) {
             return cartProduct;
           }
+
           return {
             ...cartProduct,
             quantity: cartProduct.quantity - 1,
@@ -130,7 +143,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       include: {
         restaurant: {
           select: {
+            id: true;
             deliveryFee: true;
+            deliveryTimeMinutes: true;
           };
         };
       };
@@ -142,12 +157,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       setProducts([]);
     }
 
-    // VERIFICAR SE HÁ ALGUM PRODUTO DE OUTRRO RESTAURANTE NO CARRINHO
-    const hasDifferentRestaurantProduct = products.some(
-      (cartProduct) => cartProduct.restaurantId !== product.restaurantId,
-    );
-
-    // VERIFICAR SE O PRODUTO JA ESTA NO CARRINHO E
+    // VERIFICAR SE O PRODUTO JÁ ESTÁ NO CARRINHO
     const isProductAlreadyOnCart = products.some(
       (cartProduct) => cartProduct.id === product.id,
     );
@@ -167,7 +177,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         }),
       );
     }
-    // SE NÃO ADICIONA-LO COM A QUANTIDADE QUE EU RECEBO
+
+    // SE NÃO, ADICIONÁ-LO COM A QUANTIDADE RECEBIDA
     setProducts((prev) => [...prev, { ...product, quantity: quantity }]);
   };
 
@@ -179,6 +190,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         totalPrice,
         totalDiscounts,
         totalQuantity,
+        clearCart,
         addProductToCart,
         decreaseProductQuantity,
         increaseProductQuantity,
