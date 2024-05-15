@@ -79,8 +79,9 @@ const RestaurantPage = async ({ params: { id } }: RestaurantPageProps) => {
             <Image
               src={restaurant.imageUrl}
               alt={restaurant.name}
-              className="rounded-full object-cover"
               fill
+              sizes="100%"
+              className="rounded-full object-cover"
             />
           </div>
           <h1 className="text-xl font-semibold">{restaurant.name}</h1>
